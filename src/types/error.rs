@@ -15,7 +15,7 @@ pub enum JevvyError {
   #[error("TYPESAFE_API_KEY environment variable is not set")]
   MissingApiKey,
 
-  // Underlying network, DNS, or serialization falure from reqwest
+  // Underlying network, DNS, or serialization failure from reqwest
   #[error("HTTP request error: {0}")]
   Request(#[from] reqwest::Error),
 
@@ -23,7 +23,7 @@ pub enum JevvyError {
   Unauthorized,
 
   /// Missing or invalidated API Key
-  #[error("Unauthorized (401) on field `{field:?}: {message}")]
+  #[error("Unauthorized (422) on field `{field:?}: {message}")]
   UnprocessableEntity {
     field:   Option<String>,
     message: String,
@@ -42,6 +42,18 @@ pub enum JevvyError {
   Api {
     status:  StatusCode,
     message: String,
+  },
+
+  /// No answer came back under this key.
+  #[error("no answer for `{0}`")]
+  MissingAnswer(String),
+
+  /// The answer exists, but it's a different kind.
+  #[error("answer `{key}` is a {found}, not a {expected}")]
+  WrongAnswerType {
+    key:      String,
+    expected: &'static str,
+    found:    &'static str,
   },
 }
 
@@ -81,7 +93,7 @@ pub async fn handle_response(response: Response) -> Result<Response, JevvyError>
       message,
     }),
     | 429 => Err(JevvyError::RateLimited),
-    | 528 => Err(JevvyError::Overloaded),
+    | 529 => Err(JevvyError::Overloaded),
     | _ => Err(JevvyError::Api { status, message }),
   }
 }

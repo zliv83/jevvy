@@ -25,6 +25,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .send()
     .await?;
 
-  println!("{res:#?}");
+  println!("urgent: {:.2}", res.noul("is_urgent")?);
+  let team = res.choice("team")?;
+  println!(
+    "team: {} ({:.0}% sure)",
+    team.choice,
+    team.confidence * 100.0
+  );
+  println!(
+    "mood: {:.2}",
+    res
+      .score("mood")?
+      .score
+  );
   Ok(())
 }

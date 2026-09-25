@@ -7,8 +7,8 @@
 
 use indexmap::IndexMap;
 use jevvy::{
-  client::Jevvy,
-  types::{questions::Question, request::Request},
+	client::Jevvy,
+	types::{questions::Question, request::Request},
 };
 
 #[tokio::main]
@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   questions.insert(
     "is_urgent".to_string(),
     Question::Noul {
-      instructions: Some("Does this convey urgency?".into()),
+      instructions: "Does this convey urgency?".into(),
       criteria:     None,
     },
   );

@@ -8,22 +8,19 @@ pub type Questions = IndexMap<String, Question>;
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Question {
   Noul {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    instructions: Option<Entry>,
+    instructions: Entry,
     #[serde(skip_serializing_if = "Option::is_none")]
     criteria:     Option<NoulCriteria>,
   },
   Choice {
     /// The question the model answers
-    #[serde(skip_serializing_if = "Option::is_none")]
-    instructions: Option<Entry>,
+    instructions: Entry,
     /// The answer options, as a map. Each key is an option name
     /// and each value is a description of that option.
     criteria:     IndexMap<String, Option<Entry>>,
   },
   Score {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    instructions: Option<Entry>,
+    instructions: Entry,
     criteria:     Entries,
   },
 }
@@ -32,7 +29,7 @@ impl Question {
   /// A yes/no question. The answer is the probability of "yes".
   pub fn noul(instructions: impl Into<Entry>) -> Self {
     Question::Noul {
-      instructions: Some(instructions.into()),
+      instructions: instructions.into(),
       criteria:     None,
     }
   }
@@ -43,7 +40,7 @@ impl Question {
     levels: impl IntoIterator<Item = impl Into<Entry>>,
   ) -> Self {
     Question::Score {
-      instructions: Some(instructions.into()),
+      instructions: instructions.into(),
       criteria:     levels
         .into_iter()
         .map(Into::into)
@@ -57,7 +54,7 @@ impl Question {
     options: impl IntoIterator<Item = impl Into<ChoiceOption>>,
   ) -> Self {
     Question::Choice {
-      instructions: Some(instructions.into()),
+      instructions: instructions.into(),
       criteria:     options
         .into_iter()
         .map(|option| {
@@ -71,13 +68,14 @@ impl Question {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NoulCriteria {
-  #[serde(rename = "true")]
+  #[serde(rename = "true", skip_serializing_if = "Option::is_none")]
   pub yes: Option<Entry>,
-  #[serde(rename = "false")]
+  #[serde(rename = "false", skip_serializing_if = "Option::is_none")]
   pub no:  Option<Entry>,
 }
 
 /// One option in a Choice question - a name, plus an optional description
+#[derive(Debug, Clone)]
 pub struct ChoiceOption {
   pub name:        String,
   pub description: Option<Entry>,
@@ -88,6 +86,16 @@ impl From<&str> for ChoiceOption {
   fn from(name: &str) -> Self {
     Self {
       name:        name.into(),
+      description: None,
+    }
+  }
+}
+
+/// So names from a Vec<String> work too.
+impl From<String> for ChoiceOption {
+  fn from(name: String) -> Self {
+    Self {
+      name,
       description: None,
     }
   }
