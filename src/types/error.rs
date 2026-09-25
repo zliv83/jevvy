@@ -15,7 +15,7 @@ pub enum JevvyError {
   #[error("TYPESAFE_API_KEY environment variable is not set")]
   MissingApiKey,
 
-  // Underlying network, DNS, or serialization failure from reqwest
+  /// Underlying network, DNS, or serialization failure from reqwest
   #[error("HTTP request error: {0}")]
   Request(#[from] reqwest::Error),
 
@@ -23,7 +23,7 @@ pub enum JevvyError {
   Unauthorized,
 
   /// Missing or invalidated API Key
-  #[error("Unauthorized (422) on field `{field:?}: {message}")]
+  #[error("Unauthorized (422) on field `{field:?}`: {message}")]
   UnprocessableEntity {
     field:   Option<String>,
     message: String,
@@ -55,6 +55,10 @@ pub enum JevvyError {
     expected: &'static str,
     found:    &'static str,
   },
+
+  /// The API named an option your enum doesn't have.
+  #[error("unknown option `{0}`: it isn't in your enum")]
+  UnknownOption(String),
 }
 
 /// Handles response for errors

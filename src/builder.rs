@@ -1,17 +1,17 @@
 use crate::{
-  client::Jevvy,
-  types::{
-    error::JevvyError,
-    questions::{ChoiceOption, Question},
-    request::Request,
-    response::Response,
-    Entry,
+	client::Jevvy,
+	types::{
+		Entry,
+		error::JevvyError,
+		questions::{ChoiceOption, Question},
+		request::Request,
+		response::Response,
   },
 };
 
 /// A request being put together, one question at a time.
 ///
-/// Mady by [`Jevvy::evaluate`]. Add questions with the chain methods,
+/// Made by [`Jevvy::evaluate`]. Add questions with the chain methods,
 /// then call `.send()`.
 #[must_use = "a RequestBuilder does nothing until you call .send()"]
 pub struct RequestBuilder<'a> {
@@ -39,7 +39,7 @@ impl<'a> RequestBuilder<'a> {
 
   /// Adds a yes/no question under `key`.
   ///
-  /// The answer comes back as the porbability of "yes", from 0 to 1.
+  /// The answer comes back as the probability of "yes", from 0 to 1.
   pub fn noul(self, key: impl Into<String>, instructions: impl Into<Entry>) -> Self {
     self.question(key, Question::noul(instructions))
   }
@@ -76,7 +76,7 @@ impl<'a> RequestBuilder<'a> {
   ///
   /// # Errors
   ///
-  /// Same as [`Jevvy::execute`]: network trouble, a rejected reqeust
+  /// Same as [`Jevvy::execute`]: network trouble, a rejected request
   /// or TypeSafe.ai is still busy after every retry.
   pub async fn send(self) -> Result<Response, JevvyError> {
     self

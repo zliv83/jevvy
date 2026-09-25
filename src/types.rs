@@ -4,4 +4,6 @@ pub mod error;
 pub mod questions;
 pub mod request;
 pub mod response;
+pub mod typed;
+
 pub use entry::*;
