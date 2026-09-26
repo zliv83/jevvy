@@ -1,3 +1,8 @@
 /target
 .env
-.idea
+.idea/
+.zed/
+.claude/
+AGENTS.md
+CLAUDE.md
+.codex/

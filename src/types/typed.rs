@@ -1,9 +1,9 @@
 use crate::{
-	traits::{Levels, Options},
-	types::{
-		answers::{ChoiceAnswer, ScoreAnswer},
-		error::JevvyError,
-	},
+  traits::{Levels, Options},
+  types::{
+    answers::{ChoiceAnswer, ScoreAnswer},
+    jevvy_error::JevvyError,
+  },
 };
 use indexmap::IndexMap;
 
@@ -46,7 +46,10 @@ impl<T: Options> TryFrom<&ChoiceAnswer> for Choice<T> {
 }
 
 fn lookup<T: Options>(name: &str) -> Result<T, JevvyError> {
-  T::from_name(name).ok_or_else(|| JevvyError::UnknownOption(name.to_owned()))
+  T::from_name(name).ok_or_else(|| JevvyError::UnknownOption {
+    key:   "?".into(),
+    found: name.to_owned(),
+  })
 }
 
 /// A score answer, matched to your own enum of levels.
@@ -83,5 +86,8 @@ fn level_at<T: Levels>(key: &str) -> Result<T, JevvyError> {
     .parse()
     .ok()
     .and_then(T::from_index)
-    .ok_or_else(|| JevvyError::UnknownLevel(key.to_owned()))
+    .ok_or_else(|| JevvyError::UnknownLevel {
+      key:   "?".into(),
+      found: key.to_owned(),
+    })
 }

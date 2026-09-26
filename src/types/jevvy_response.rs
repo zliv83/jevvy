@@ -1,14 +1,16 @@
 use serde::{Deserialize, Serialize};
 
 use crate::types::{
-	answers::{Answer, Answers, ChoiceAnswer, ScoreAnswer},
-	error::JevvyError,
+  answers::{Answer, Answers, ChoiceAnswer, ScoreAnswer},
+  jevvy_error::JevvyError,
 };
 
-/// One answer per question, returned under the same ids you provided
-
+/// One reply. The model that answered, one answer per qeustion id,
+/// and the tokens used. Keep the whole thing - it's the receipt.
+///
+/// Named `JevvyResponse` so it's never mistaken for `reqwest::Response`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Response {
+pub struct JevvyResponse {
   /// Model - The model that performed the eval
   pub model: String,
 
@@ -19,8 +21,12 @@ pub struct Response {
   pub usage: Usage,
 }
 
-impl Response {
+impl JevvyResponse {
   /// Looks up any answer by key.
+  ///
+  /// # Errors
+  ///
+  /// `JevvyError`
   pub fn answer(&self, key: &str) -> Result<&Answer, JevvyError> {
     self
       .answers

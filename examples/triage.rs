@@ -2,9 +2,9 @@ use jevvy::{
   client::Jevvy,
   traits::{Levels, Options, Rubric},
   types::{
-    error::JevvyError,
+    jevvy_error::JevvyError,
+    jevvy_response::JevvyResponse,
     questions::{Question, Questions},
-    response::Response,
     typed::{Choice, Score},
   },
 };
@@ -88,7 +88,7 @@ impl Rubric for Triage {
     ])
   }
 
-  fn from_response(res: &Response) -> Result<Self, JevvyError> {
+  fn from_response(res: &JevvyResponse) -> Result<Self, JevvyError> {
     Ok(Triage {
       is_bug:    res.noul("is_bug")?,
       has_repro: res.noul("has_repro")?,

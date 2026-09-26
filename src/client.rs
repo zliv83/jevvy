@@ -6,9 +6,9 @@ use crate::{
   builder::RequestBuilder,
   traits::Rubric,
   types::{
-    error::{handle_response, JevvyError},
-    request::Request,
-    response::Response,
+    jevvy_error::{handle_response, JevvyError},
+    jevvy_request::JevvyRequest,
+    jevvy_response::JevvyResponse,
     Entry,
   },
 };
@@ -97,7 +97,7 @@ impl Jevvy {
   ///
   /// Returns [`JevvyError`] if the request can't be sent, TypeSafe.ai
   /// rejects it, or TypeSafe.ai is still busy after every retry.
-  pub async fn execute(&self, request: &Request) -> Result<Response, JevvyError> {
+  pub async fn execute(&self, request: &JevvyRequest) -> Result<JevvyResponse, JevvyError> {
     let url = format!(
       "{}/v1/systemone",
       self
@@ -131,7 +131,7 @@ impl Jevvy {
 
       return Ok(
         res
-          .json::<Response>()
+          .json::<JevvyResponse>()
           .await?,
       );
     }
@@ -141,7 +141,7 @@ impl Jevvy {
   ///
   /// Add questions with chain methiods, then call `.send()`.
   pub fn evaluate(&self, state: impl Into<Entry>) -> RequestBuilder<'_> {
-    let request = Request {
+    let request = JevvyRequest {
       state:     state.into(),
       model:     self
         .model
@@ -159,7 +159,7 @@ impl Jevvy {
   /// Anything [`Jevvy::execute`] can return , plus a missing, mismatched,
   /// or unknown answer while filling in `T`.
   pub async fn ask<T: Rubric>(&self, state: impl Into<Entry>) -> Result<T, JevvyError> {
-    let request = Request {
+    let request = JevvyRequest {
       state:     state.into(),
       model:     self
         .model

@@ -1,0 +1,345 @@
+{
+  "main": {
+    "id": "1a6d719f50ed5bad",
+    "type": "split",
+    "children": [
+      {
+        "id": "e932f107e944acd1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "78ee9a042c33e08c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Concepts/Primatives/Noul.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Noul"
+            }
+          },
+          {
+            "id": "edacae27ccf85c6e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Concepts/Primatives/Advanced (structure).md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Advanced (structure)"
+            }
+          },
+          {
+            "id": "74017127082e1a54",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Concepts/Confidence.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Confidence"
+            }
+          },
+          {
+            "id": "20600613cb13a100",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Concepts/How to build with TypeSafe.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "How to build with TypeSafe"
+            }
+          },
+          {
+            "id": "8124a17c0ccc9e34",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Concepts/AI Primer.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "AI Primer"
+            }
+          },
+          {
+            "id": "fcc6a44a57a8b21e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Patterns/Patterns.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Patterns"
+            }
+          },
+          {
+            "id": "02fa35cd93a1c568",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Patterns/Speculative fan-out.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Speculative fan-out"
+            }
+          },
+          {
+            "id": "f0d2d0c6002f2d2d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Patterns/Confidence-gated routing.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Confidence-gated routing"
+            }
+          },
+          {
+            "id": "eaa22d1d95031f09",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Patterns/Composite scoring.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Composite scoring"
+            }
+          },
+          {
+            "id": "9ef88e1f2f18581c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Patterns/Intent routing.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Intent routing"
+            }
+          }
+        ],
+        "currentTab": 9
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "76b4d41ab0cd5213",
+    "type": "split",
+    "children": [
+      {
+        "id": "c814714433530600",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3ef16843de54b104",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "f66055134ed94f68",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "7a8a4ca671f597b2",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e359ac39334545fc",
+    "type": "split",
+    "children": [
+      {
+        "id": "7092f9fb77ceeed8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9bee8f77004e7f1a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Patterns/Intent routing.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "54830010701cc8a9",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Patterns/Intent routing.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "a0f50e4d6d8baa6d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "36f2f24fc4b5a5f7",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "5ccb7eec39804c2f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Patterns/Intent routing.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "3ef16843de54b104",
+  "lastOpenFiles": [
+    "Index.md",
+    "Patterns/Composite scoring.md",
+    "Patterns/Intent routing.md",
+    "Patterns/Confidence-gated routing.md",
+    "Patterns/Speculative fan-out.md",
+    "Patterns/Patterns.md",
+    "Concepts/AI Primer.md",
+    "Patterns",
+    "Concepts/How to build with TypeSafe.md",
+    "Concepts/Confidence.md",
+    "Concepts/Primatives/Advanced (structure).md",
+    "primitives/score.md",
+    "Concepts/Primatives/Noul.md",
+    "API reference.md",
+    "Model Jaggedness.md",
+    "Concepts/System One.md",
+    "Concepts/Primatives/Primitives (Questions).md",
+    "Concepts/Primatives/Choice.md",
+    "Concepts/Primatives/Score.md",
+    "Concepts/State.md",
+    "primitives",
+    "Concepts/Primatives",
+    "Concepts",
+    "llms.md"
+  ]
+}

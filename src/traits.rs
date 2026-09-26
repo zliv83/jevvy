@@ -1,8 +1,8 @@
 use crate::types::{
-	Entry,
-	error::JevvyError,
-	questions::{ChoiceOption, Question, Questions},
-	response::Response,
+  jevvy_error::JevvyError,
+  jevvy_response::JevvyResponse,
+  questions::{ChoiceOption, Question, Questions},
+  Entry,
 };
 use std::hash::Hash;
 
@@ -101,5 +101,5 @@ pub trait Rubric: Sized {
   ///
   /// If an answer is missing, is the wrong kind, or names
   /// an option or level the field's enum doesn't have.
-  fn from_response(response: &Response) -> Result<Self, JevvyError>;
+  fn from_response(response: &JevvyResponse) -> Result<Self, JevvyError>;
 }

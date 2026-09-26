@@ -7,8 +7,8 @@
 
 use indexmap::IndexMap;
 use jevvy::{
-	client::Jevvy,
-	types::{questions::Question, request::Request},
+  client::Jevvy,
+  types::{jevvy_request::JevvyRequest, questions::Question},
 };
 
 #[tokio::main]
@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
   );
 
   // Wrap it in a request.
-  let request = Request {
+  let request = JevvyRequest {
     state: "Help! My payouts have been failing for 3 days".into(),
     model: "jev-latest".into(),
     questions,

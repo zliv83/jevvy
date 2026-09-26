@@ -1,11 +1,11 @@
 use crate::{
-	client::Jevvy,
-	types::{
-		Entry,
-		error::JevvyError,
-		questions::{ChoiceOption, Question},
-		request::Request,
-		response::Response,
+  client::Jevvy,
+  types::{
+    jevvy_error::JevvyError,
+    jevvy_request::JevvyRequest,
+    jevvy_response::JevvyResponse,
+    questions::{ChoiceOption, Question},
+    Entry,
   },
 };
 
@@ -19,12 +19,12 @@ pub struct RequestBuilder<'a> {
   client: &'a Jevvy,
 
   /// The request being filled in.
-  request: Request,
+  request: JevvyRequest,
 }
 
 impl<'a> RequestBuilder<'a> {
   /// Starts a builder.
-  pub(crate) fn new(client: &'a Jevvy, request: Request) -> Self {
+  pub(crate) fn new(client: &'a Jevvy, request: JevvyRequest) -> Self {
     Self { client, request }
   }
 
@@ -78,7 +78,7 @@ impl<'a> RequestBuilder<'a> {
   ///
   /// Same as [`Jevvy::execute`]: network trouble, a rejected request
   /// or TypeSafe.ai is still busy after every retry.
-  pub async fn send(self) -> Result<Response, JevvyError> {
+  pub async fn send(self) -> Result<JevvyResponse, JevvyError> {
     self
       .client
       .execute(&self.request)

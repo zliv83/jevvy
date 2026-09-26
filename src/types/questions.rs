@@ -1,26 +1,48 @@
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Entries, Entry};
+use crate::types::{jevvy_error::JevvyError, Entries, Entry};
+
+/// The most options one Choice can offer.
+pub const MAX_OPTIONS: usize = 255;
+
+/// The fewest levels one Score can have. One level isn't a scale.
+pub const MIN_LEVELS: usize = 2;
+
+/// The most levels one Score can have.
+pub const MAX_LEVELS: usize = 10;
+
+/// Every question in a request, keyed by the id you choose.
+///
+/// Order is kept, so the request JSON reads in the order you wrote it.
 pub type Questions = IndexMap<String, Question>;
 
+/// One judgement about the state. The `type` field designates which question.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum Question {
+  /// Ys or no. Th answer is the probability of yes, from 0 to 1.
   Noul {
+    /// the yes/no question.
     instructions: Entry,
+    /// What a yes and no mean. Skips if 'None`.
     #[serde(skip_serializing_if = "Option::is_none")]
     criteria:     Option<NoulCriteria>,
   },
+
+  /// Pick one option from a set you wrote.
   Choice {
-    /// The question the model answers
+    /// What the model should decide.
     instructions: Entry,
-    /// The answer options, as a map. Each key is an option name
-    /// and each value is a description of that option.
+    /// Option name to descrtiption. `None` sends `null`.
     criteria:     IndexMap<String, Option<Entry>>,
   },
+
+  /// A postion on an ordered scale, lowest level first.
   Score {
+    /// What the model should rate.
     instructions: Entry,
+    /// The levels, lowest first. The order *is* the scale.
     criteria:     Entries,
   },
 }
@@ -64,20 +86,66 @@ impl Question {
         .collect(),
     }
   }
+
+  /// Checks the API's limits before anything leaves the machine.
+  ///
+  /// A choice needs 1 to 255 options, and a Score needs 2 to 10 levels.
+  /// A Noul has nothing to count, so it always passes.
+  ///
+  /// `key` is the question's id in the request. A question doesn't know its
+  /// own id, so it's passed in to say which question broke the rule.
+  ///
+  /// # Errors
+  ///
+  /// [`JevvyError::BadOptionCount`] or [`JevvyError::BadLevelCount`].
+  pub fn validate(&self, key: &str) -> Result<(), JevvyError> {
+    match self {
+      | Question::Noul { .. } => Ok(()),
+      | Question::Choice { criteria, .. } => {
+        let count = criteria.len();
+        if (1..=MAX_OPTIONS).contains(&count) {
+          Ok(())
+        } else {
+          Err(JevvyError::BadOptionCount {
+            key: key.to_owned(),
+            count,
+          })
+        }
+      }
+      | Question::Score { criteria, .. } => {
+        let count = criteria.len();
+        if (MIN_LEVELS..=MAX_LEVELS).contains(&count) {
+          Ok(())
+        } else {
+          Err(JevvyError::BadLevelCount {
+            key: key.to_owned(),
+            count,
+          })
+        }
+      }
+    }
+  }
 }
 
+/// What a yes and a no mean for a Noul. Either side can be left off.
+///
+/// The docs call the two sides `true` and `false`. Those are rust keywords,
+/// so the fields are `when_true` and `when_false`, and serde renames them.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NoulCriteria {
+  /// What a yes (near 1) means.
   #[serde(rename = "true", skip_serializing_if = "Option::is_none")]
-  pub yes: Option<Entry>,
+  pub when_true:  Option<Entry>,
   #[serde(rename = "false", skip_serializing_if = "Option::is_none")]
-  pub no:  Option<Entry>,
+  pub when_false: Option<Entry>,
 }
 
 /// One option in a Choice question - a name, plus an optional description
 #[derive(Debug, Clone)]
 pub struct ChoiceOption {
+  /// The option's name, sent as a key in `criteria`, e.g. `"billing"`.
   pub name:        String,
+  /// What the option means. `None` sends `null`.
   pub description: Option<Entry>,
 }
 
