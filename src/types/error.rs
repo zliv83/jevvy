@@ -59,6 +59,10 @@ pub enum JevvyError {
   /// The API named an option your enum doesn't have.
   #[error("unknown option `{0}`: it isn't in your enum")]
   UnknownOption(String),
+
+  /// The API named a level position your enum doesn't have.
+  #[error("unknown level `{0}`: your enum has no level at that position")]
+  UnknownLevel(String),
 }
 
 /// Handles response for errors

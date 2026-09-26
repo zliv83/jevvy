@@ -2,7 +2,7 @@
 
 A friendly, typed Rust client for the [TypeSafe AI System One API](https://docs.typesafe.ai/api).
 
-**Where we are:** Stages 1–3 are done. **Next up: Stage 4, traits written by hand.**
+**Where we are:** Stages 1–3 are done. Stage 4 is in progress: steps 1–2 are done (answer wrappers and `Options`). **Next up: Step 3, the `Levels` trait.**
 
 _Last updated: 2026-09-25_
 
@@ -15,7 +15,7 @@ _Last updated: 2026-09-25_
 | 1 | Types | ✅ Done |
 | 2 | Client core | ✅ Done |
 | 3 | Builder and accessors | ✅ Done |
-| 4 | Traits, written by hand | ⏭️ **Next** |
+| 4 | Traits, written by hand | 🚧 **In progress** (steps 1–2 of 6 done) |
 | 5 | Derive macros | ⬜ |
 | 6 | Polish and publish | ⬜ |
 
@@ -56,9 +56,10 @@ mood: 1.04
 
 ```
 src/
-  lib.rs            pub mod builder, client, types
+  lib.rs            pub mod builder, client, traits, types
   client.rs         Jevvy: new, from_env, setters, execute (retry loop), evaluate
   builder.rs        RequestBuilder<'a>: noul, choice, score, question, model, send
+  traits.rs         Options (Levels and Rubric coming)
   types.rs          re-exports entry::*
   types/
     entry.rs        Entry (untagged: Text | Object | Array) + From impls
@@ -67,9 +68,11 @@ src/
     answers.rs      Answer (Noul | Choice | Score) wrapping NoulAnswer / ChoiceAnswer / ScoreAnswer
     response.rs     Response + getters (answer, noul, choice, score), Usage
     error.rs        JevvyError + handle_response
+    typed.rs        Choice<T>, Score<T>, TryFrom<&ChoiceAnswer> for Choice<T>
 examples/
   smoke.rs          builder route, prints typed answers
   manual.rs         hand-built Request sent with execute()
+  triage.rs         the issue-triage bot, growing step by step (no network yet)
 ```
 
 ---
@@ -103,34 +106,33 @@ examples/
 
 ---
 
-## Stage 4: Traits, written by hand ⏭️ NEXT
+## Stage 4: Traits, written by hand 🚧 IN PROGRESS
 
 **Goal:** swap string keys for real Rust types. Write every impl by hand first. That becomes the blueprint the macros will generate in Stage 5.
 
+**The whole shape:** `Rubric` is the whole form, `Options` is the list of boxes in a multiple-choice question, `Levels` is a rating line from low to high.
+
+```
+ struct Triage: Rubric ──questions()──► Request ──► API
+   is_bug:   f64                                     │
+   area:     Choice<Area>     ◄── Options            │
+   severity: Score<Severity>  ◄── Levels             ▼
+ Triage ◄────────── from_response() ◄──────── Response
+```
+
 **Steps:**
 
-1. Add generic answer wrappers that keep confidence, so users can match on confidence ranges:
-   ```rust
-   pub struct Choice<T> {
-     pub value: T,
-     pub confidence: f64,
-     pub probabilities: IndexMap<T, f64>,
-   }
-
-   pub struct Score<T> {
-     pub level: T,        // nearest level, e.g. Severity::Annoying
-     pub raw: f64,        // the actual value, e.g. 1.05
-     pub confidence: f64,
-     pub probabilities: IndexMap<T, f64>,
-   }
-   ```
-   Noul stays a plain `f64`. An optional helper: `choice.confident(0.9) -> Option<&T>`.
-2. Define three traits:
-   - `Options`: enum variants ↔ Choice criteria names and descriptions, and back again. Needs `Hash + Eq` for the `probabilities` keys.
-   - `Levels`: ordered enum variants ↔ Score levels, plus picking the nearest level from `raw`.
-   - `Rubric`: a struct → its questions, and a `Response` → that struct.
-3. Hand-write all three for the issue-triage example below.
-4. Add `jevvy.ask::<T: Rubric>(state).await -> Result<T, JevvyError>`.
+1. ✅ **Answer wrappers** (`src/types/typed.rs`). `Choice<T> { value, confidence, probabilities: IndexMap<T, f64> }` and `Score<T> { level, raw, confidence, probabilities }`. Noul stays a plain `f64`. Helper: `choice.confident(min) -> Option<&T>`.
+2. ✅ **`Options` trait** (`src/traits.rs`).
+   - `pub trait Options: Copy + Eq + Hash + 'static`. `Hash + Eq` because variants are `probabilities` keys.
+   - Required: `const ALL: &'static [Self]` and `fn name(&self) -> &'static str`. Default bodies: `describe()` (returns `None`) and `from_name()` (searches `ALL`). Less for the macro to generate.
+   - Lesson: `'static` is needed because `&'static [Self]` promises the list lives forever, so every `Self` in it must too.
+   - `impl<T: Options> TryFrom<&ChoiceAnswer> for Choice<T>`, the "bouncer." Every name must be in `ALL`, or it returns `JevvyError::UnknownOption(name)`. It uses a `lookup` helper and `.collect::<Result<_, _>>()`, which stops at the first bad name.
+   - `examples/triage.rs` hand-implements `Options` for `Area` and tests with fake `ChoiceAnswer`s built via `serde_json::from_value(json!(...))`.
+3. ⏭️ **`Levels` trait.** Ordered enum variants ↔ Score levels, plus picking the nearest level from `raw`. Then `TryFrom<&ScoreAnswer> for Score<T>`.
+4. **`Rubric` trait.** A struct → its questions, and a `Response` → that struct.
+5. **Hand-write `Rubric` for `Triage`** in `examples/triage.rs` (`Area` already has `Options`).
+6. **`jevvy.ask::<T: Rubric>(state).await -> Result<T, JevvyError>`.**
 
 **Target example (the issue-triage bot):**
 
@@ -184,7 +186,8 @@ enum Area {
 
 ## Stage 6: Polish and publish ⬜
 
-- Add `examples/triage.rs`, the full issue-triage bot.
+- Finish `examples/triage.rs` as the full issue-triage bot.
+- ⚠️ `.env` (with the API key) was in the first commit. It's untracked and ignored now, but it's still in git history. Before adding a remote or publishing, rotate the key or rewrite history.
 - Add a mock transport so tests don't hit the network.
 - Write docs with runnable examples, then publish to crates.io.
 
@@ -196,6 +199,8 @@ enum Area {
 - A nicer builder method for Noul criteria (what "yes" and "no" mean).
 - Client-side validation: Score needs 2–10 levels, Choice allows at most 255 options.
 - Unit tests for `Entry` serialization and the `From` impls.
+- `UnknownOption` could name the question key, e.g. "`area`: unknown option `pizza`".
+- Leftover nits: the 422 error message still says "Unauthorized"; `client.rs` typos ("hand-build", "methiods", "thats").
 
 ---
 

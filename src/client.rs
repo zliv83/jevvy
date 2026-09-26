@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 
 use crate::{
   builder::RequestBuilder,
+  traits::Rubric,
   types::{
     error::{handle_response, JevvyError},
     request::Request,
@@ -149,6 +150,29 @@ impl Jevvy {
     };
 
     RequestBuilder::new(self, request)
+  }
+
+  /// Asks every question in `T`'s rubric about `state`, and fills in a `T`.
+  ///
+  /// # Errors
+  ///
+  /// Anything [`Jevvy::execute`] can return , plus a missing, mismatched,
+  /// or unknown answer while filling in `T`.
+  pub async fn ask<T: Rubric>(&self, state: impl Into<Entry>) -> Result<T, JevvyError> {
+    let request = Request {
+      state:     state.into(),
+      model:     self
+        .model
+        .clone(),
+      // The rubric writes the questions. No builder needed!
+      questions: T::questions(),
+    };
+
+    let response = self
+      .execute(&request)
+      .await?;
+
+    T::from_response(&response)
   }
 }
 

@@ -1,6 +1,9 @@
 use crate::{
-	traits::Options,
-	types::{answers::ChoiceAnswer, error::JevvyError},
+	traits::{Levels, Options},
+	types::{
+		answers::{ChoiceAnswer, ScoreAnswer},
+		error::JevvyError,
+	},
 };
 use indexmap::IndexMap;
 
@@ -55,4 +58,30 @@ pub struct Score<T> {
   pub raw:           f64,
   pub confidence:    f64,
   pub probabilities: IndexMap<T, f64>,
+}
+
+impl<T: Levels> TryFrom<&ScoreAnswer> for Score<T> {
+  type Error = JevvyError;
+
+  fn try_from(answer: &ScoreAnswer) -> Result<Self, Self::Error> {
+    Ok(Score {
+      level:         T::nearest(answer.score),
+      raw:           answer.score,
+      confidence:    answer.confidence,
+      probabilities: answer
+        .probabilities
+        .iter()
+        .map(|(key, p)| level_at(key).map(|level| (level, *p)))
+        .collect::<Result<_, _>>()?,
+    })
+  }
+}
+
+/// Turns a positoin key from the API ("1") into a level, or an error.
+fn level_at<T: Levels>(key: &str) -> Result<T, JevvyError> {
+  key
+    .parse()
+    .ok()
+    .and_then(T::from_index)
+    .ok_or_else(|| JevvyError::UnknownLevel(key.to_owned()))
 }
