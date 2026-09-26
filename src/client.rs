@@ -1,46 +1,50 @@
 use std::{env, time::Duration};
 
-use indexmap::IndexMap;
-
 use crate::{
-  builder::RequestBuilder,
+  builder::JevvyRequestBuilder,
   traits::Rubric,
+  transport::{Http, Transport},
   types::{
-    jevvy_error::{handle_response, JevvyError},
-    jevvy_request::JevvyRequest,
-    jevvy_response::JevvyResponse,
-    Entry,
+    jevvy_error::JevvyError, jevvy_request::JevvyRequest, jevvy_response::JevvyResponse,
+    questions::Questions, Entry,
   },
 };
 
-const DEFAULT_BASE_URL: &str = "https://api.typesafe.ai";
-const DEFAULT_MODEL: &str = "jev-latest";
-const DEFAULT_MAX_RETRIES: u32 = 5;
+/// The model every request uses unless you pick another.
+pub const DEFAULT_MODEL: &str = "jev-latest";
 
-pub struct Jevvy {
-  http:        reqwest::Client,
-  api_key:     String,
-  base_url:    String,
-  model:       String,
-  max_retries: u32,
+/// The client. A transport to send through, as well as a defaut model.
+///
+/// `T` is the plug. it defaults to [`Http`], so plain 'Jevvy' means
+/// "talks to the real API".
+#[derive(Clone)]
+pub struct Jevvy<T = Http> {
+  /// How requests reach the API
+  transport: T,
+  /// The model new requests start with.
+  model:     String,
 }
 
-impl Jevvy {
+// -- Only for the real API (T = HTTP) --
+
+impl Jevvy<Http> {
+  /// A client for the real API, with the default model, retries and timeout.
+  #[must_use]
   pub fn new(api_key: impl Into<String>) -> Self {
     Jevvy {
-      http:        reqwest::Client::new(),
-      api_key:     api_key.into(),
-      base_url:    DEFAULT_BASE_URL.into(),
-      model:       DEFAULT_MODEL.into(),
-      max_retries: DEFAULT_MAX_RETRIES,
+      transport: Http::new(api_key),
+      model:     DEFAULT_MODEL.into(),
     }
   }
 
-  /// Loads env vars
+  /// A client configured from environment variables.
+  ///
+  /// `TYPESAFE_API_KEY` is required. `TYPESAFE_BASE_URL`,
+  /// `TYPESAFE_BASE_MODEL` and `TYPESAFE_MAX_RETRIES` are optional.
   ///
   /// # Errors
   ///
-  /// [`JevvyError`]
+  /// [`JevvyError::MissingApiKey`] if `TYPESAFE_API_KEY` isn't set.
   pub fn from_env() -> Result<Self, JevvyError> {
     let api_key = env::var("TYPESAFE_API_KEY").map_err(|_| JevvyError::MissingApiKey)?;
     let mut client = Self::new(api_key);
@@ -66,118 +70,110 @@ impl Jevvy {
     Ok(client)
   }
 
+  /// Sends to a diverent server, e.g. a local mock.
   #[must_use]
   pub fn base_url(mut self, base_url: impl Into<String>) -> Self {
-    self.base_url = base_url.into();
+    self.transport = self
+      .transport
+      .base_url(base_url);
     self
   }
 
+  /// How many extra tries a busy API (429, 529) gets.
+  #[must_use]
+  pub fn max_retries(mut self, max_retries: u32) -> Self {
+    self.transport = self
+      .transport
+      .max_retries(max_retries);
+    self
+  }
+
+  /// How long one try may take before it's a [`JevvyError::Timeout`].
+  #[must_use]
+  pub fn timeout(mut self, timeout: Duration) -> Self {
+    self.transport = self
+      .transport
+      .timeout(timeout);
+    self
+  }
+}
+
+// -- For every transport --
+
+impl<T: Transport> Jevvy<T> {
+  /// Swaps the plug, keeping the model.
+  ///
+  /// `U` is the new transport's type, so the result is a `Jevy<U>`.
+  #[must_use]
+  pub fn with_transport<U: Transport>(self, transport: U) -> Jevvy<U> {
+    Jevvy {
+      transport,
+      model: self.model,
+    }
+  }
+
+  /// The model new reqeusts start with.
   #[must_use]
   pub fn model(mut self, model: impl Into<String>) -> Self {
     self.model = model.into();
     self
   }
 
-  #[must_use]
-  pub fn max_retries(mut self, max_retries: u32) -> Self {
-    self.max_retries = max_retries;
-    self
-  }
-
-  /// Sends a hand-build [`Request`] with questions to TypeSafe.ai and returns its answers.
+  /// Checks every question, then sends a finished [`JevvyRequest`].
   ///
-  /// Most of the time you'll want [`Jevvy::evaluate`] instead, which builds the
-  /// request for you . Use this when you already have a `Request`, i.e. one thats
-  /// loaded from a file.
-  ///
-  /// If TypeSafe.ai is busy (429 or 529), waits and tries again,
-  /// longer each time, up to `max_retries` extra tries.
+  /// This is the one door every request goes through. Nothing leaves
+  /// the machine until every question is within the API's limits.
   ///
   /// # Errors
   ///
-  /// Returns [`JevvyError`] if the request can't be sent, TypeSafe.ai
-  /// rejects it, or TypeSafe.ai is still busy after every retry.
-  pub async fn execute(&self, request: &JevvyRequest) -> Result<JevvyResponse, JevvyError> {
-    let url = format!(
-      "{}/v1/systemone",
-      self
-        .base_url
-        .trim_end_matches('/')
-    );
-
-    let mut attempt = 0;
-
-    loop {
-      let res = self
-        .http
-        .post(&url)
-        .bearer_auth(&self.api_key)
-        .json(request)
-        .send()
-        .await?;
-
-      let status = res
-        .status()
-        .as_u16();
-      let busy = status == 429 || status == 529;
-
-      if busy && attempt < self.max_retries {
-        tokio::time::sleep(backoff(attempt)).await;
-        attempt += 1;
-        continue;
-      }
-
-      let res = handle_response(res).await?;
-
-      return Ok(
-        res
-          .json::<JevvyResponse>()
-          .await?,
-      );
+  /// [`JevvyError::BadOptionCount`] or [`JevvyError::BadLevelCount`]
+  /// before sending, or anything the transport returns.
+  pub async fn send(&self, jevvy_request: &JevvyRequest) -> Result<JevvyResponse, JevvyError> {
+    // `?` stops at the first bad question and returns its error.
+    for (key, question) in &jevvy_request.questions {
+      question.validate(key)?;
     }
+
+    self
+      .transport
+      .send(jevvy_request)
+      .await
   }
 
-  /// Starts a new request about `state`, which can be sent text or JSON.
+  /// Starts a new request about `state`, which can be text or JevvyResponse.
   ///
-  /// Add questions with chain methiods, then call `.send()`.
-  pub fn evaluate(&self, state: impl Into<Entry>) -> RequestBuilder<'_> {
-    let request = JevvyRequest {
+  /// Add questions with the chain methids, then call `.send()`.
+  pub fn evaluate(&self, state: impl Into<Entry>) -> JevvyRequestBuilder<'_, T> {
+    let jevvy_request = JevvyRequest {
       state:     state.into(),
       model:     self
         .model
         .clone(),
-      questions: IndexMap::new(),
+      questions: Questions::new(),
     };
 
-    RequestBuilder::new(self, request)
+    JevvyRequestBuilder::new(self, jevvy_request)
   }
 
-  /// Asks every question in `T`'s rubric about `state`, and fills in a `T`.
+  /// Asks every question in the `R`'s rubric about `state`, and fillls in an `R`.
   ///
   /// # Errors
   ///
-  /// Anything [`Jevvy::execute`] can return , plus a missing, mismatched,
-  /// or unknown answer while filling in `T`.
-  pub async fn ask<T: Rubric>(&self, state: impl Into<Entry>) -> Result<T, JevvyError> {
-    let request = JevvyRequest {
+  /// Antything [`Jevvy::send`] can return, plus a missing, mismatched,
+  /// or unknown asnwer while filling in `R`.
+  pub async fn ask<R: Rubric>(&self, state: impl Into<Entry>) -> Result<R, JevvyError> {
+    let jevvy_request = JevvyRequest {
       state:     state.into(),
       model:     self
         .model
         .clone(),
-      // The rubric writes the questions. No builder needed!
-      questions: T::questions(),
+      questions: R::questions(),
     };
 
-    let response = self
-      .execute(&request)
+    let jevvy_response = self
+      .send(&jevvy_request)
       .await?;
 
-    T::from_response(&response)
+    R::from_response(&jevvy_response)
   }
-}
-
-/// How long to wait before retry number `attempt` (starting at 0).
-/// Doubles each time.
-fn backoff(attempt: u32) -> Duration {
-  Duration::from_millis(500 * 2u64.pow(attempt.min(4)))
 }

@@ -1,5 +1,6 @@
 use crate::{
   client::Jevvy,
+  transport::{Http, Transport},
   types::{
     jevvy_error::JevvyError,
     jevvy_request::JevvyRequest,
@@ -13,25 +14,28 @@ use crate::{
 ///
 /// Made by [`Jevvy::evaluate`]. Add questions with the chain methods,
 /// then call `.send()`.
-#[must_use = "a RequestBuilder does nothing until you call .send()"]
-pub struct RequestBuilder<'a> {
+#[must_use = "a JevvRequestBuilder does nothing until you call .send()"]
+pub struct JevvyRequestBuilder<'a, T = Http> {
   /// The client that will send this request. Borrowed, not owned. 🍸
-  client: &'a Jevvy,
+  client: &'a Jevvy<T>,
 
   /// The request being filled in.
-  request: JevvyRequest,
+  jevvy_request: JevvyRequest,
 }
 
-impl<'a> RequestBuilder<'a> {
+impl<'a, T: Transport> JevvyRequestBuilder<'a, T> {
   /// Starts a builder.
-  pub(crate) fn new(client: &'a Jevvy, request: JevvyRequest) -> Self {
-    Self { client, request }
+  pub(crate) fn new(client: &'a Jevvy<T>, jevvy_request: JevvyRequest) -> Self {
+    Self {
+      client,
+      jevvy_request,
+    }
   }
 
   /// Adds any question under `key`. This is a shared helper
   pub fn question(mut self, key: impl Into<String>, question: Question) -> Self {
     self
-      .request
+      .jevvy_request
       .questions
       .insert(key.into(), question);
     self
@@ -67,7 +71,7 @@ impl<'a> RequestBuilder<'a> {
   /// Uses a different model for this request only
   pub fn model(mut self, model: impl Into<String>) -> Self {
     self
-      .request
+      .jevvy_request
       .model = model.into();
     self
   }
@@ -81,7 +85,7 @@ impl<'a> RequestBuilder<'a> {
   pub async fn send(self) -> Result<JevvyResponse, JevvyError> {
     self
       .client
-      .execute(&self.request)
+      .send(&self.jevvy_request)
       .await
   }
 }
