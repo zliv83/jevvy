@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::types::{questions::Questions, Entry};
-/// One requst. The body POSTed to `/v1/systemone`.
+/// One request. The body POSTed to `/v1/systemone`.
 ///
-/// One state, one model, and every question about this moemnt.
-/// Named 'JevvyRequest` so it's never mistaken for `reqwest::Request`.
+/// One state, one model, and every question about this moment.
+/// Named `JevvyRequest` so it's never mistaken for `reqwest::Request`.
 ///
 /// The top level has three fields:
 ///    1. state - the content to evaluate

@@ -1,11 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::{
-  answers::{Answer, Answers, ChoiceAnswer, ScoreAnswer},
-  jevvy_error::JevvyError,
+use crate::{
+  sheet::AnswerSheet,
+  types::{
+    answers::{Answer, Answers, ChoiceAnswer, ScoreAnswer},
+    jevvy_error::JevvyError,
+  },
 };
 
-/// One reply. The model that answered, one answer per qeustion id,
+/// One reply. The model that answered, one answer per question id,
 /// and the tokens used. Keep the whole thing - it's the receipt.
 ///
 /// Named `JevvyResponse` so it's never mistaken for `reqwest::Response`.
@@ -22,40 +25,11 @@ pub struct JevvyResponse {
 }
 
 impl JevvyResponse {
-  /// Looks up any answer by key.
-  ///
-  /// # Errors
-  ///
-  /// `JevvyError`
-  pub fn answer(&self, key: &str) -> Result<&Answer, JevvyError> {
-    self
-      .answers
-      .get(key)
-      .ok_or_else(|| JevvyError::MissingAnswer(key.to_owned()))
-  }
-
-  /// The probability of "yes" for the Noul under `key`.
-  pub fn noul(&self, key: &str) -> Result<f64, JevvyError> {
-    match self.answer(key)? {
-      | Answer::Noul(a) => Ok(a.noul),
-      | other => Err(wrong_type(key, "noul", other)),
-    }
-  }
-
-  /// The Choice answer under `key`.
-  pub fn choice(&self, key: &str) -> Result<&ChoiceAnswer, JevvyError> {
-    match self.answer(key)? {
-      | Answer::Choice(a) => Ok(a),
-      | other => Err(wrong_type(key, "choice", other)),
-    }
-  }
-
-  /// The Score answer under `key`.
-  pub fn score(&self, key: &str) -> Result<&ScoreAnswer, JevvyError> {
-    match self.answer(key)? {
-      | Answer::Score(a) => Ok(a),
-      | other => Err(wrong_type(key, "score", other)),
-    }
+  /// The root answer sheet.
+  /// Read answers by key, or through a form.
+  #[must_use]
+  pub fn sheet(&self) -> AnswerSheet<'_> {
+    AnswerSheet::root(&self.answers)
   }
 }
 

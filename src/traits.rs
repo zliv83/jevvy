@@ -1,23 +1,27 @@
-use crate::types::{
-  jevvy_error::JevvyError,
-  jevvy_response::JevvyResponse,
-  questions::{ChoiceOption, Question, Questions},
-  Entry,
-};
 use std::hash::Hash;
+
+use crate::{
+  sheet::{AnswerSheet, QuestionSheet},
+  types::{
+    jevvy_error::JevvyError,
+    questions::{ChoiceOption, Question},
+    Entry,
+  },
+};
 
 /// An enum whose variants are the options of a Choice question.
 ///
 /// `Copy + Eq + Hash` lets a variant be a key in `Choice::probabilities`.
 pub trait Options: Copy + Eq + Hash + 'static {
-  /// Every variant, in the order the model should see them.
+  /// Every variant, in order the model should see them.
   const ALL: &'static [Self];
 
   /// The name sent to the API, e.g. `"networking"`.
   fn name(&self) -> &'static str;
 
-  /// What this option means. `None` sends no description.
-  fn describe(&self) -> Option<&'static str> {
+  /// What this option means, as text or a structured object.
+  /// `None` sends `null`.
+  fn describe(&self) -> Option<Entry> {
     None
   }
 
@@ -29,7 +33,7 @@ pub trait Options: Copy + Eq + Hash + 'static {
       .find(|option| option.name() == name)
   }
 
-  /// A Choice question that offers every variant.
+  /// A Choice question that offers every variant, in `ALL` order.
   fn question(instructions: impl Into<Entry>) -> Question {
     Question::choice(
       instructions,
@@ -39,67 +43,73 @@ pub trait Options: Copy + Eq + Hash + 'static {
           name:        option
             .name()
             .into(),
-          description: option
-            .describe()
-            .map(Entry::from),
+          description: option.describe(),
         }),
     )
   }
 }
 
-/// An enum whose variants are the levels of a Score question,
+/// An enum whose variants are the levels fo a Score question,
 /// from lowest to highest.
 pub trait Levels: Copy + Eq + Hash + 'static {
   /// Every level, lowest first. This order *is* the scale.
   const ALL: &'static [Self];
 
-  /// The text the model reads for this level.
-  fn describe(&self) -> &'static str;
+  /// What this level means, as text or a structured object.
+  fn describe(&self) -> Entry;
 
-  /// The level at position `index` (0 is the lowest).
+  /// The level at postition `index` (0 is the lowest).
   fn from_index(index: usize) -> Option<Self> {
     Self::ALL
       .get(index)
       .copied()
   }
 
-  /// The level closest to a raw score, e.g. 1.05 -> position 1.
+  /// This level's position on the scale. 0 for the first in `ALL`.
   ///
   /// # Panics
   ///
-  /// If `ALL` is empty. The API requires at least 2 levels anyway.
-  fn nearest(raw: f64) -> Self {
-    let last = Self::ALL.len() - 1;
-    // clamp keeps od sources (like -1.0 or 2.7) on the scale
-    let index = raw
-      .round()
-      .clamp(0.0, last as f64) as usize;
-    Self::ALL[index]
+  /// If `self` isn't in `ALL`, which means `ALL` is missing a variant.
+  fn index(&self) -> usize {
+    Self::ALL
+      .iter()
+      .position(|level| level == self)
+      .expect("every level must be listed in Levels::ALL")
   }
 
   /// A Score question with every level, lowest first.
   fn question(instructions: impl Into<Entry>) -> Question {
+    // `Self::describe` is the method used as a fucntion: &Self -> Entry.
     Question::score(
       instructions,
       Self::ALL
         .iter()
-        .map(|level| level.describe()),
+        .map(Self::describe),
     )
   }
 }
 
-/// A struct whose fields are the answers to a set of questions.
+/// A set of questions with a typed answer sheet on the back.
 ///
-/// One field = one question. The field name is the question's key.
-pub trait Rubric: Sized {
-  /// Every question to ask, keyed by field name.
-  fn questions() -> Questions;
+/// A form *contributes* questions to a request it doesn't own.
+/// `ask` writes onto the sheet it's handed, and `read` reads back
+/// from the matching sheet with the same short keys.
+///
+/// A unit struct(`struct TriageForm;`) is a constant form.
+/// A struct with fields (`struct SamePerson<'a> { record: &'a Candidate })`
+/// is a form build from data. Same trait for both.
+pub trait Form {
+  /// What `read` fiills in, e.g. `Triage { team, frustration, ..} `.
+  type Answers;
 
-  /// Fills the struct from the API's answers.
+  /// Writes the form's questions onto `sheet`.
+  fn ask(&self, sheet: &mut QuestionSheet<'_>);
+
+  /// Reads this form's answers back from `sheet`.
   ///
   /// # Errors
   ///
-  /// If an answer is missing, is the wrong kind, or names
-  /// an option or level the field's enum doesn't have.
-  fn from_response(response: &JevvyResponse) -> Result<Self, JevvyError>;
+  /// A missing answer, the wrong kind, or an option or level your
+  /// enum doesn't have.
+  fn read(&self, sheet: &AnswerSheet<'_>) -> Result<Self::Answers, JevvyError>;
 }

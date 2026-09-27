@@ -1,8 +1,7 @@
 use std::{env, time::Duration};
 
 use crate::{
-  builder::JevvyRequestBuilder,
-  traits::Rubric,
+  batch::Batch,
   transport::{Http, Transport},
   types::{
     jevvy_error::JevvyError, jevvy_request::JevvyRequest, jevvy_response::JevvyResponse,
@@ -143,7 +142,7 @@ impl<T: Transport> Jevvy<T> {
   /// Starts a new request about `state`, which can be text or JevvyResponse.
   ///
   /// Add questions with the chain methids, then call `.send()`.
-  pub fn evaluate(&self, state: impl Into<Entry>) -> JevvyRequestBuilder<'_, T> {
+  pub fn ask(&self, state: impl Into<Entry>) -> Batch<'_, T> {
     let jevvy_request = JevvyRequest {
       state:     state.into(),
       model:     self
@@ -152,28 +151,6 @@ impl<T: Transport> Jevvy<T> {
       questions: Questions::new(),
     };
 
-    JevvyRequestBuilder::new(self, jevvy_request)
-  }
-
-  /// Asks every question in the `R`'s rubric about `state`, and fillls in an `R`.
-  ///
-  /// # Errors
-  ///
-  /// Antything [`Jevvy::send`] can return, plus a missing, mismatched,
-  /// or unknown asnwer while filling in `R`.
-  pub async fn ask<R: Rubric>(&self, state: impl Into<Entry>) -> Result<R, JevvyError> {
-    let jevvy_request = JevvyRequest {
-      state:     state.into(),
-      model:     self
-        .model
-        .clone(),
-      questions: R::questions(),
-    };
-
-    let jevvy_response = self
-      .send(&jevvy_request)
-      .await?;
-
-    R::from_response(&jevvy_response)
+    Batch::new(self, jevvy_request)
   }
 }

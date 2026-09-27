@@ -56,6 +56,20 @@ impl Question {
     }
   }
 
+  pub fn noul_with(
+    instructions: impl Into<Entry>,
+    when_true: impl Into<Entry>,
+    when_false: impl Into<Entry>,
+  ) -> Self {
+    Question::Noul {
+      instructions: instructions.into(),
+      criteria:     Some(NoulCriteria {
+        when_true:  Some(when_true.into()),
+        when_false: Some(when_false.into()),
+      }),
+    }
+  }
+
   /// Rates the state on an ordered scale, from lowest to highest.
   pub fn score(
     instructions: impl Into<Entry>,

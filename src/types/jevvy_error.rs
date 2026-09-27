@@ -1,4 +1,3 @@
-use reqwest::{Response, StatusCode};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use thiserror::Error;
@@ -68,7 +67,7 @@ pub enum JevvyError {
   #[error("API error ({status}): {message}")]
   Api {
     /// The HTTP status code.
-    status:  StatusCode,
+    status:  reqwest::StatusCode,
     /// The API's explanation, or "Unknown API error".
     message: String,
   },

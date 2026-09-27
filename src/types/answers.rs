@@ -13,7 +13,7 @@ pub type Probabilities<K = String> = IndexMap<K, f64>;
 pub type Legend = IndexMap<String, Entry>;
 
 /// How sure the model is, from 0 to 1, worked out from the probabilities.
-type Confidence = f64;
+pub type Confidence = f64;
 
 /// Option name to description, in the order the model reads them.
 /// `None` sends `null`: the name is enough
