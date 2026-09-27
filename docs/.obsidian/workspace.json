@@ -4,165 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "e932f107e944acd1",
+        "id": "d9bc10db2c9e480e",
         "type": "tabs",
         "children": [
           {
-            "id": "78ee9a042c33e08c",
+            "id": "d97dce40d740399d",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Concepts/Primatives/Noul.md",
+                "file": "Examples/Hierarchical classification.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Noul"
-            }
-          },
-          {
-            "id": "edacae27ccf85c6e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Concepts/Primatives/Advanced (structure).md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Advanced (structure)"
-            }
-          },
-          {
-            "id": "74017127082e1a54",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Concepts/Confidence.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Confidence"
-            }
-          },
-          {
-            "id": "20600613cb13a100",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Concepts/How to build with TypeSafe.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "How to build with TypeSafe"
-            }
-          },
-          {
-            "id": "8124a17c0ccc9e34",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Concepts/AI Primer.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "AI Primer"
-            }
-          },
-          {
-            "id": "fcc6a44a57a8b21e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Patterns/Patterns.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Patterns"
-            }
-          },
-          {
-            "id": "02fa35cd93a1c568",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Patterns/Speculative fan-out.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Speculative fan-out"
-            }
-          },
-          {
-            "id": "f0d2d0c6002f2d2d",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Patterns/Confidence-gated routing.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Confidence-gated routing"
-            }
-          },
-          {
-            "id": "eaa22d1d95031f09",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Patterns/Composite scoring.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Composite scoring"
-            }
-          },
-          {
-            "id": "9ef88e1f2f18581c",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Patterns/Intent routing.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Intent routing"
-            }
-          },
-          {
-            "id": "829e24ab276f4900",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Self-consistency - nouls.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Self-consistency - nouls"
+              "title": "Hierarchical classification"
             }
           }
-        ],
-        "currentTab": 10
+        ]
       }
     ],
     "direction": "vertical"
@@ -329,23 +188,27 @@
       "bases:Create new base": false
     }
   },
-  "active": "829e24ab276f4900",
+  "active": "3ef16843de54b104",
   "lastOpenFiles": [
+    "Examples/Hierarchical classification.md",
+    "Examples/SDE cascade.md",
+    "Examples/Line-by-line search.md",
+    "Concepts/Primatives/Noul.md",
+    "Concepts/Primatives/Advanced (structure).md",
+    "Concepts/Confidence.md",
+    "Concepts/How to build with TypeSafe.md",
+    "Concepts/AI Primer.md",
+    "Patterns/Patterns.md",
+    "Patterns/Speculative fan-out.md",
+    "Patterns/Confidence-gated routing.md",
+    "Patterns/Composite scoring.md",
     "Patterns/Intent routing.md",
+    "Examples/Re-ranking.md",
     "Self-consistency - nouls.md",
     "Examples",
     "Index.md",
-    "Patterns/Composite scoring.md",
-    "Patterns/Confidence-gated routing.md",
-    "Patterns/Speculative fan-out.md",
-    "Patterns/Patterns.md",
-    "Concepts/AI Primer.md",
     "Patterns",
-    "Concepts/How to build with TypeSafe.md",
-    "Concepts/Confidence.md",
-    "Concepts/Primatives/Advanced (structure).md",
     "primitives/score.md",
-    "Concepts/Primatives/Noul.md",
     "API reference.md",
     "Model Jaggedness.md",
     "Concepts/System One.md",

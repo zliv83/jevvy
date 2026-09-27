@@ -6,4 +6,5 @@
 AGENTS.md
 CLAUDE.md
 .codex/
-codebook.toml/
+codebook.toml
+docs/.obsidian/
