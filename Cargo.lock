@@ -546,11 +546,21 @@ version = "0.1.0"
 dependencies = [
  "dotenvy",
  "indexmap",
+ "jevvy-derive",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "jevvy-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]

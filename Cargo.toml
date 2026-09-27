@@ -1,10 +1,18 @@
+[workspace]
+members = ["jevvy-derive"]
+
 [package]
 name = "jevvy"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["derive"]
+derive = ["dep:jevvy-derive"]
+
 [dependencies]
 indexmap = { version = "2.14.2", features = ["serde"] }
+jevvy-derive = { version = "0.1.0", path = "jevvy-derive", optional = true}
 reqwest = { version = "0.13.5", features = ["json"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.151", features = ["preserve_order"] }

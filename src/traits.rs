@@ -1,5 +1,8 @@
 use std::hash::Hash;
 
+#[cfg(feature = "derive")]
+pub use jevvy_derive::Options;
+
 use crate::{
   sheet::{AnswerSheet, QuestionSheet},
   types::{
