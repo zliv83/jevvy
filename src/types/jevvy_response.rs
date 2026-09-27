@@ -1,12 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-  sheet::AnswerSheet,
-  types::{
-    answers::{Answer, Answers, ChoiceAnswer, ScoreAnswer},
-    jevvy_error::JevvyError,
-  },
-};
+use crate::{sheet::AnswerSheet, types::answers::Answers};
 
 /// One reply. The model that answered, one answer per question id,
 /// and the tokens used. Keep the whole thing - it's the receipt.
@@ -30,15 +24,6 @@ impl JevvyResponse {
   #[must_use]
   pub fn sheet(&self) -> AnswerSheet<'_> {
     AnswerSheet::root(&self.answers)
-  }
-}
-
-/// Builds the "wrong kind of answer" error.
-fn wrong_type(key: &str, expected: &'static str, found: &Answer) -> JevvyError {
-  JevvyError::WrongAnswerType {
-    key: key.to_owned(),
-    expected,
-    found: found.kind(),
   }
 }
 

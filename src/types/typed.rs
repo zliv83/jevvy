@@ -21,7 +21,7 @@ pub struct Choice<T> {
 impl<T> Choice<T> {
   /// The pick, but only if confidence is at least `min`.
   #[must_use]
-  pub fn confidence(&self, min: f64) -> Option<&T> {
+  pub fn confident(&self, min: f64) -> Option<&T> {
     (self.confidence >= min).then_some(&self.choice)
   }
 }
@@ -65,7 +65,7 @@ fn lookup<T: Options>(key: &str, name: &str) -> Result<T, JevvyError> {
 /// is something you can ask for with [`Score::nearest`] or [`Score::most_likely`]
 #[derive(Debug, Clone)]
 pub struct Score<T> {
-  /// Reads API's Socre answer under `key` into your levels.
+  /// Reads API's Score answer under `key` into your levels.
   pub score:         f64,
   /// Every level's probability, in the order the API sent them.
   pub probabilities: Probabilities<T>,
@@ -100,10 +100,15 @@ impl<T: Levels> Score<T> {
   ///
   /// # Panics
   ///
-  /// If `T::ALL` is empty. The API needes at least 2 levels anyway.
+  /// If `T::ALL` is empty. The API needs at least 2 levels anyway.
   #[must_use]
   pub fn nearest(&self) -> T {
     let last = T::ALL.len() - 1;
+    #[allow(
+      clippy::cast_possible_truncation,
+      clippy::cast_sign_loss,
+      reason = "rounded to a whole number and clamped to 0..=last first"
+    )]
     let index = self
       .score
       .round()
@@ -118,14 +123,13 @@ impl<T: Levels> Score<T> {
     self
       .probabilities
       .iter()
-      // total_comp orders f64's savely, even odd ones like NaN.
+      // total_cmp orders f64s, even odd ones like NaN.
       .max_by(|a, b| {
         a.1
           .total_cmp(b.1)
       })
-      .map(|(level, _)| *level)
       // No probabilities at all shouldn't happen. Fall back to rounding.
-      .unwrap_or_else(|| self.nearest())
+      .map_or_else(|| self.nearest(), |(level, _)| *level)
   }
 
   /// `score` squeezed onto 0..=1, so scales off different sizes

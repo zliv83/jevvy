@@ -6,11 +6,8 @@ use crate::{
   traits::{Form, Levels, Options},
   transport::{Http, Transport},
   types::{
-    jevvy_error::JevvyError,
-    jevvy_request::JevvyRequest,
-    jevvy_response::JevvyResponse,
-    questions::{ChoiceOption, Question},
-    Entry,
+    jevvy_error::JevvyError, jevvy_request::JevvyRequest, jevvy_response::JevvyResponse,
+    questions::Question, Entry,
   },
 };
 
@@ -78,12 +75,7 @@ impl<'a, T: Transport> Batch<'a, T> {
   }
 
   /// Adds a Choice over every variant of `O`.
-  pub fn choice<O: Options>(
-    mut self,
-    key: &str,
-    instructions: impl Into<Entry>,
-    options: impl IntoIterator<Item = impl Into<ChoiceOption>>,
-  ) -> Self {
+  pub fn choice<O: Options>(mut self, key: &str, instructions: impl Into<Entry>) -> Self {
     self
       .sheet()
       .choice::<O>(key, instructions);
@@ -124,6 +116,12 @@ impl<'a, T: Transport> Batch<'a, T> {
       .jevvy_request
       .model = model.into();
     self
+  }
+
+  /// The request as built so far. Print it to see exactly what will go out.
+  #[must_use]
+  pub fn request(&self) -> &JevvyRequest {
+    &self.jevvy_request
   }
 
   /// Sends the request and returns TypeSafe.ai's answers.

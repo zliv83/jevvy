@@ -2,6 +2,7 @@ use std::{env, time::Duration};
 
 use crate::{
   batch::Batch,
+  traits::Form,
   transport::{Http, Transport},
   types::{
     jevvy_error::JevvyError, jevvy_request::JevvyRequest, jevvy_response::JevvyResponse,
@@ -152,5 +153,28 @@ impl<T: Transport> Jevvy<T> {
     };
 
     Batch::new(self, jevvy_request)
+  }
+
+  /// Asks one form about `state` and reads its answers back.
+  ///
+  /// The short way to write `ask(state).form("", form).send()` and then
+  /// `sheet().form("", form)`. The form's keys go out with no prefix.
+  ///
+  /// # Errors
+  ///
+  /// Anything [`Jevvy::send`] returns, or anything the form's `read` does.
+  pub async fn fill<F: Form>(
+    &self,
+    state: impl Into<Entry>,
+    form: &F,
+  ) -> Result<F::Answers, JevvyError> {
+    let res = self
+      .ask(state)
+      .form("", form)
+      .send()
+      .await?;
+    res
+      .sheet()
+      .form("", form)
   }
 }

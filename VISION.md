@@ -1,6 +1,6 @@
 # Vision: give your software a sense of judgment
 
-> The pitch, in plain words. `ROADMAP2.md` turns each paragraph below into a piece of the crate.
+> The pitch, in plain words. `ROADMAP.md` turns each paragraph below into a piece of the crate.
 
 Every program you've ever used is deaf and blind to meaning. It knows a button was clicked, a form was submitted, a message arrived. It has no idea whether the customer is angry, whether the two orders are really the same order, whether this refund request is the kind your policy covers. For thirty years the only fix was a human reading the screen. For the last three, the fix has been to bolt on a chatbot and hope it says something useful.
 
