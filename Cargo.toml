@@ -3,8 +3,15 @@ members = ["jevvy-derive"]
 
 [package]
 name = "jevvy"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 edition = "2024"
+description = "Typed Rust client for the TypeSafe AI System One API (Jev): batch typed forms in one call, gate on confidence, keep a replayable ledger"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zliv83/jevvy"
+readme = "VISION.md"
+keywords = ["typesafe", "jev", "ai", "classification", "decision"]
+categories = ["api-bindings"]
+exclude = ["jevvy-derive/", "BEAGLE.md", "codebook.toml", ".env"]
 
 [features]
 default = ["derive"]
@@ -12,7 +19,7 @@ derive = ["dep:jevvy-derive"]
 
 [dependencies]
 indexmap = { version = "2.14.2", features = ["serde"] }
-jevvy-derive = { version = "0.1.0", path = "jevvy-derive", optional = true}
+jevvy-derive = { version = "=0.1.0-alpha.1", path = "jevvy-derive", optional = true}
 reqwest = { version = "0.13.5", features = ["json"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.151", features = ["preserve_order"] }

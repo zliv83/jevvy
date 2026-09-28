@@ -1,7 +1,12 @@
 [package]
 name = "jevvy-derive"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 edition = "2024"
+description = "Derive macros for jevvy: Options, Levels and Form"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/zliv83/jevvy"
+keywords = ["typesafe", "jev", "derive"]
+categories = ["api-bindings"]
 
 [lib]
 proc-macro = true
