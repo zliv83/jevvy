@@ -1,0 +1,9 @@
+/target
+AGENTS.md
+CLAUDE.md
+.claude/
+.codex/
+codebook.toml
+docs/
+.idea/
+.env

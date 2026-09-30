@@ -1,0 +1,39 @@
+[package]
+name = "jevvy"
+version = "0.2.0-alpha.1"
+description = "Typed Rust client for TypeSafe AI's Jev API - ask typed questions, get typed answers"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/zliv83/jevvy"
+readme = "README.md"
+keywords = ["typesafe", "jev", "ai", "classification"]
+categories = ["api-bindings"]
+include = ["src/**", "examples/**", "tests/**", "README.md", "LICENSE"]
+
+
+[dependencies]
+dotenvy = { version = "0.15.7", optional = true }
+reqwest = { version = "0.13.5", features = ["json"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.21"
+
+[dev-dependencies]
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread"] }
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+# Hand-picked from `restriction` (never enable the whole group)
+unwrap_used = "warn"
+expect_used = "warn"
+dbg_macro = "warn"
+todo = "warn"
+print_stdout = "warn"
+# Doc-comment lints, off while specing (delete these to re-enable)
+doc_markdown = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[features]
+dotenvy = ["dep:dotenvy"]

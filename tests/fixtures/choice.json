@@ -1,0 +1,10 @@
+{
+  "type": "choice",
+  "choice": "technical",
+  "probabilities": {
+    "billing": 0.05,
+    "technical": 0.85,
+    "other": 0.10
+  },
+  "confidence": 0.80
+}

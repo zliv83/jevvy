@@ -1,0 +1,26 @@
+# Editions
+edition = "2024"
+
+# Indentation: 2 spaces
+tab_spaces = 2
+hard_tabs = false
+
+# Put chained method calls on separate lines
+chain_width = 0
+
+# Break a call's arguments onto separate lines once they exceed 40 chars (default 60)
+fn_call_width = 40
+
+# Aligning match arm arrows (=>)
+match_arm_blocks = false
+match_arm_leading_pipes = "Always"
+
+# Visual alignment niceties (Note: require nightly rustfmt; run `cargo +nightly fmt`)
+unstable_features = true
+struct_field_align_threshold = 20
+enum_discrim_align_threshold = 20
+
+# Merge imports from the same crate into one nested `use` tree
+imports_granularity = "Crate"
+# 2021 sort order: lowercase paths before CamelCase items (`questions::Question, Entry`)
+style_edition = "2021"
