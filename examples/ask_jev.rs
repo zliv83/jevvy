@@ -1,6 +1,10 @@
 use jevvy::{Jev, JevvyError, NoulQuestion, Questions};
 
 #[tokio::main]
+#[expect(
+  clippy::print_stdout,
+  reason = "printing Jev's answer is the point of this example"
+)]
 async fn main() -> Result<(), JevvyError> {
   let about_apple = NoulQuestion::builder()
     .instructions("Does this article concern Apple?")

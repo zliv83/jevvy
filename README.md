@@ -7,12 +7,17 @@ ticket, or a chat log. Jev replies with one typed answer per question.
 
 ## Status
 
-This repository is a rebuild. The builder interface below works and has made live
-calls, but the API is still changing. A derive interface is planned and does not
-exist yet. The `jevvy 0.1.0-alpha.1` on crates.io is the previous implementation,
-with a different API.
+Alpha. This rebuild is published as `jevvy 0.2.0-alpha.1`. The builder interface
+below works and has made live calls, but the API is still changing. A derive
+interface is planned and does not exist yet. `0.1.0-alpha.1` was the previous
+implementation, with a different API.
 
 ## Quickstart
+
+```sh
+cargo add jevvy@0.2.0-alpha.1
+cargo add tokio --features macros,rt-multi-thread
+```
 
 Set `TYPESAFE_API_KEY`, then:
 
