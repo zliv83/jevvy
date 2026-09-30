@@ -50,6 +50,25 @@ async fn main() -> Result<(), JevvyError> {
 Jevvy is async. The example uses Tokio (`macros` and `rt-multi-thread`). From a
 clone of this repository, run the same flow with `cargo run --example ask_jev`.
 
+### Loading the key from `.env`
+
+The optional `dotenvy` feature adds `Jev::from_dotenv()`:
+
+```sh
+cargo add jevvy@0.2.0-alpha.1 --features dotenvy
+```
+
+```rust
+let jev = Jev::from_dotenv()?;
+```
+
+It loads a `.env` file from the current directory or a parent into the
+environment, then reads `TYPESAFE_API_KEY` exactly like `Jev::from_env()`.
+Variables already set in the environment take precedence over the file. A
+missing or unreadable `.env` is `JevvyError::Dotenv`, and a missing key is
+`JevvyError::MissingApiKey`. Add `.env` to your `.gitignore` so the key stays out
+of your repository.
+
 ## What's here
 
 | You ask          | Built with                                                           | Jev answers    | Read with                                                    |
