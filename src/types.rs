@@ -9,7 +9,7 @@ use std::{
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-/// Shared type for question input content.
+/// Text, an object, or an array used as state, instructions, or criteria.
 pub enum InputContent {
   Text(String),
   Object(HashMap<String, Value>),
@@ -107,8 +107,7 @@ impl Display for Confidence {
 }
 
 // ---- QuestionId ----
-/// Identifies the question. Used as the question's key on the wire,
-/// and as a lookup for its answer.
+/// A question's ID, used as its key in the request and to find its answer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct QuestionId(u64);
 

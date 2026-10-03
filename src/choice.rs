@@ -10,18 +10,18 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize)]
-/// Picks one option from a set you define. Returns the chosen
-/// option and the full probability distribution.
+/// A question with options you define. Jev picks one and returns
+/// the probability of each option.
 ///
-/// Construct one with `ChoiceQuestion::builder()`.
+/// Build one with `ChoiceQuestion::builder()`.
 pub struct ChoiceQuestion {
   #[serde(skip)]
   id:           QuestionId,
-  /// What the model should decide. An object can hold the question
-  /// in one field and data it refers to in the others.
+  /// What the model should decide. Use an object to include the question
+  /// in one field and supporting data in others.
   instructions: Instructions,
-  /// A map of option to rubric description; use None when an option needs no
-  /// extra detail. You can have a max of 255 options.
+  /// Options and their descriptions, keyed by option name.
+  /// Use `None` when an option needs no description. The limit is 255 options.
   criteria:     ChoiceCriteria,
 }
 
@@ -59,11 +59,13 @@ impl Question for ChoiceQuestion {
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[serde(transparent)]
-/// The options for a choice. Keyed by option name. Serializes as a JSON object.
+/// The options Jev can choose from.
+///
+/// Serializes as a JSON object keyed by option name.
 pub struct ChoiceCriteria(HashMap<String, Option<InputContent>>);
 
 impl ChoiceCriteria {
-  /// Each option's name, and it's description, if it has one.
+  /// Yields each option's name and its description, if any.
   pub fn iter(&self) -> impl Iterator<Item = (&str, Option<&InputContent>)> {
     self
       .0
@@ -99,7 +101,7 @@ pub struct ChoiceBuilder {
 }
 
 impl ChoiceBuilder {
-  /// Entry point is `ChoiceQuestion::builder()`.
+  /// Creates an empty builder for `ChoiceQuestion::builder()`.
   fn new() -> Self {
     Self {
       instructions: None,
@@ -153,28 +155,28 @@ impl ChoiceBuilder {
 /// Jev's answer to a `ChoiceQuestion`.
 #[derive(Debug, Deserialize)]
 pub struct ChoiceAnswer {
-  /// The highest-probability option.
+  /// The option with the highest probability.
   choice:        String,
-  /// Every option mapped to its probability (floats that sum to 1).
+  /// The probability of each option, keyed by name. The values sum to 1.
   probabilities: Probabilities,
-  /// How certain the model is, derived from probabilities.
+  /// The model's certainty, calculated from the probabilities.
   confidence:    Confidence,
 }
 
 impl ChoiceAnswer {
-  /// The highest-probability option.
+  /// The option with the highest probability.
   #[must_use]
   pub fn choice(&self) -> &str {
     &self.choice
   }
 
-  /// Every option mapped to its probability (floats that sum to 1).
+  /// The probability of each option, keyed by name. The values sum to 1.
   #[must_use]
   pub const fn probabilities(&self) -> &Probabilities {
     &self.probabilities
   }
 
-  /// How certain the model is, derived from probabilities.
+  /// The model's certainty, calculated from the probabilities.
   #[must_use]
   pub const fn confidence(&self) -> Confidence {
     self.confidence

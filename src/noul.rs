@@ -8,14 +8,14 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize)]
-/// A yes/no question. Returns the probability the answer is yes.
+/// A yes/no question. Jev answers with the probability of yes.
 ///
-/// Construct one with `NoulQuestion::builder()`.
+/// Build one with `NoulQuestion::builder()`.
 pub struct NoulQuestion {
   #[serde(skip)]
   id:           QuestionId,
-  /// The yes/no question to evaluate. An object can hold the question in one
-  /// field and data it refers to in the others.
+  /// The yes/no question to ask. Use an object to include the question
+  /// in one field and supporting data in others.
   instructions: Instructions,
   /// See `NoulCriteria`.
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,12 +57,12 @@ impl Question for NoulQuestion {
 }
 
 #[derive(Clone, Debug, Serialize)]
-/// Optional descriptions of what a yes and a no mean.
+/// Optional descriptions of what yes and no mean for this question.
 pub struct NoulCriteria {
-  /// What a yes (value near 1) means.
+  /// What yes means. Values near 1 favor this answer.
   #[serde(rename = "true")]
   yes: InputContent,
-  /// What a no (value near 0) means.
+  /// What no means. Values near 0 favor this answer.
   #[serde(rename = "false")]
   no:  InputContent,
 }
@@ -86,7 +86,7 @@ pub struct NoulBuilder {
 }
 
 impl NoulBuilder {
-  /// Entry point is `NoulQuestion::builder()`.
+  /// Creates an empty builder for `NoulQuestion::builder()`.
   const fn new() -> Self {
     Self {
       instructions: None,
@@ -129,9 +129,9 @@ pub struct NoulAnswer {
 }
 
 impl NoulAnswer {
-  /// Returns the unchanged Noul value.
+  /// The probability of yes, from 0 (no) to 1 (yes).
   ///
-  /// The yes/no answer on a scale from 0 (no) to 1 (yes).
+  /// Returns the value exactly as Jev sent it.
   #[must_use]
   pub const fn confidence(&self) -> Confidence {
     self.noul

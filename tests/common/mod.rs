@@ -2,12 +2,12 @@ use jevvy::{Question, Reply};
 use serde_json::{json, Value};
 use std::{error::Error, fs, path::Path};
 
-/// Builds a synthetic `Reply` that answers `question` with the answer in
+/// Builds a test reply to `question` using the answer from
 /// `tests/fixtures/<fixture>.json`.
 ///
-/// Question ids come from a global counter, so a fixture can't know them in
-/// advance. The fixture holds only the answer, and this wraps it in a reply
-/// keyed by the question's real id.
+/// Question IDs come from a global counter and aren't known in advance.
+/// The fixture stores only the answer. This helper wraps it in a reply
+/// using the question's ID.
 ///
 /// Add `mod common;` to any integration test file to use this helper.
 pub fn reply_to(question: &impl Question, fixture: &str) -> Result<Reply, Box<dyn Error>> {

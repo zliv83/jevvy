@@ -1,14 +1,13 @@
 # Answer fixtures
 
-`fixtures/noul.json`, `fixtures/choice.json`, and `fixtures/score.json` each hold
-one TypeSafe answer, one per answer type. They are synthetic examples based on the
+`fixtures/noul.json`, `fixtures/choice.json`, and `fixtures/score.json` each contain
+an answer of the corresponding type. These examples are based on the
 [official SDK's response types](https://github.com/typesafe-ai/typesafe-sdk-js/blob/main/src/types.ts),
-not captured API responses. Tests using them need neither an API key nor network
-access.
+not captured API responses. The tests need no API key or network access.
 
-Question ids come from a global counter, so a fixture can't know the id of the
-question it answers. `common::reply_to` wraps a fixture in a `Reply` keyed by the
-real `question.id()`:
+Question IDs come from a global counter and aren't known in advance.
+`common::reply_to` wraps the fixture's answer in a `Reply` using the ID of
+the question you pass in:
 
 ```rust
 mod common;

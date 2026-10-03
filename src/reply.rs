@@ -7,8 +7,10 @@ use crate::{
   score::ScoreAnswer, types::QuestionId,
 };
 
-/// Any kind of answer, in its wire shape. The `"type"` field picks the variant,
-/// so renaming a variant changes what Jevvy can decode.
+/// A Noul, Choice, or Score answer.
+///
+/// Jevvy matches the answer's `"type"` to a variant name in lowercase.
+/// Renaming a variant changes which answers Jevvy can decode.
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum AnyAnswer {
@@ -17,8 +19,9 @@ pub enum AnyAnswer {
   Score(ScoreAnswer),
 }
 
-/// Everything Jev sends back from `jev.ask(&questions)`: one answer per
-/// question, plus the model that answered and the tokens it used.
+/// Jev's reply to `jev.ask(&questions)`.
+///
+/// Contains an answer for each question, the model name, and token counts.
 #[derive(Debug, Deserialize)]
 pub struct Reply {
   model:   String,
@@ -27,12 +30,12 @@ pub struct Reply {
 }
 
 impl Reply {
-  /// Jev's answer to `question`, as the answer type that question declares.
+  /// Finds the answer to `question` by ID and borrows it as `Q::Answer`.
   ///
-  /// Fails with `MissingAnswer` if this reply has no answer for the question,
-  /// or `WrongAnswerKind` if the answer isn't the kind the question asked for.
+  /// Returns `MissingAnswer` if the reply has no answer for this question,
+  /// or `WrongAnswerKind` if the answer's kind doesn't match the question type.
   pub fn answer<Q: Question>(&self, question: &Q) -> Result<&Q::Answer, JevvyError> {
-    // `Q::extract` to turn the `AnyAnswer` into `&Q::Answer`.
+    // Look up the answer by ID, then extract the expected answer type.
     let id = question.id();
 
     let any_answer = self
@@ -43,7 +46,7 @@ impl Reply {
     Q::extract(any_answer).ok_or(JevvyError::WrongAnswerKind { id })
   }
 
-  /// The model that answered, as Jev reported it (e.g. `jev-1.13.0`).
+  /// The model name reported by Jev, such as `jev-1.13.0`.
   #[must_use]
   pub fn model(&self) -> &str {
     &self.model

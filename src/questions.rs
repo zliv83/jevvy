@@ -12,20 +12,22 @@ use std::collections::HashMap;
 
 /// A question you can ask Jev.
 ///
-/// Each question type names the answer Jev gives back for it.
+/// Each question type has a matching answer type.
 pub trait Question {
   type Answer;
 
-  /// Identifies this question in the questions you send and in Jev's reply.
+  /// Returns the question's ID, used in both the request and Jev's reply.
   fn id(&self) -> QuestionId;
 
-  /// Picks this question's kind of answer out of `AnyAnswer`, or `None`
-  /// if Jev answered with a different kind.
+  /// Borrows the answer from `AnyAnswer` if its kind matches this question type.
+  /// Returns `None` if the kinds don't match.
   fn extract(answer: &AnyAnswer) -> Option<&Self::Answer>;
 }
 
-/// Any kind of question, in its wire shape. The `"type"` field comes from
-/// the variant names, so renaming the variant changes what Jev receives.
+/// A Noul, Choice, or Score question.
+///
+/// When sent to Jev, the question's `"type"` is its variant name in lowercase.
+/// Renaming a variant changes the value Jev receives.
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum AnyQuestion {
@@ -68,9 +70,9 @@ impl From<ScoreQuestion> for AnyQuestion {
   }
 }
 
-/// The questions you ask Jev together, all about one shared state.
+/// A set of questions about the same state, sent to Jev in one request.
 ///
-/// Construct with `Questions::builder()`, send with `jev.ask(&questions)`.
+/// Build it with `Questions::builder()` and send it with `jev.ask(&questions)`.
 #[derive(Debug, Serialize)]
 #[expect(clippy::struct_field_names, reason = "wire field is named `questions`")]
 pub struct Questions {
@@ -102,8 +104,9 @@ impl QuestionsBuilder {
     self
   }
 
-  /// Adds a copy of `question`. Keep the original: it's how you look up
-  /// this question's answer.
+  /// Adds a clone of `question` with the same ID.
+  ///
+  /// Keep the original to look up its answer with `reply.answer(&question)`.
   #[must_use]
   pub fn question<Q>(mut self, question: &Q) -> Self
   where

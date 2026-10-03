@@ -10,18 +10,18 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Serialize)]
-/// Rates the state along a rubric you define. Returns a probability-weighted
-/// value across your levels.
+/// A question that asks Jev to rate the state using levels you define.
+/// Jev weights each level number by its probability to calculate the score.
 ///
-/// Construct one with `ScoreQuestion::builder()`.
+/// Build one with `ScoreQuestion::builder()`.
 pub struct ScoreQuestion {
   #[serde(skip)]
   id:           QuestionId,
-  /// What the model should rate. An object can hold the question in one field
-  /// and data it refers to in others.
+  /// What the model should rate. Use an object to include the question
+  /// in one field and supporting data in others.
   instructions: Instructions,
-  /// An ordered array of level descriptions. A Score should have at least
-  /// two levels - the API accepts up to 10.
+  /// An array of level descriptions, ordered from lowest to highest.
+  /// The API requires 2 to 10 levels.
   criteria:     ScoreCriteria,
 }
 
@@ -62,7 +62,7 @@ impl Question for ScoreQuestion {
 pub struct ScoreCriteria(Vec<InputContent>);
 
 impl ScoreCriteria {
-  /// Levels in rubric order: the first item is level 0.
+  /// Yields the levels in rubric order, starting at level 0.
   pub fn iter(&self) -> impl Iterator<Item = &InputContent> {
     self
       .0
@@ -97,7 +97,7 @@ pub struct ScoreBuilder {
 }
 
 impl ScoreBuilder {
-  /// Entry point is `ScoreQuestion::builder()`.
+  /// Creates an empty builder for `ScoreQuestion::builder()`.
   fn new() -> Self {
     Self {
       instructions: None,
@@ -112,8 +112,8 @@ impl ScoreBuilder {
   }
 
   #[must_use]
-  /// Adds the next rubric level. Call order sets the level number: the first
-  /// call is level 0 (lowest), the next is level 1, and so on.
+  /// Adds a level to the rubric, from lowest to highest.
+  /// The first level you add is 0, the next is 1, and so on.
   pub fn level(mut self, level: impl Into<InputContent>) -> Self {
     self
       .criteria
@@ -145,36 +145,40 @@ impl ScoreBuilder {
 /// Jev's answer to a `ScoreQuestion`.
 #[derive(Debug, Deserialize)]
 pub struct ScoreAnswer {
-  /// The probability-weighted answer across the levels; can land between levels.
+  /// The average level number, weighted by probability.
+  /// The score can fall between levels.
   score:         f64,
-  /// Each level number mapped back to its description.
+  /// Level descriptions, keyed by level number.
   legend:        ScoreLegend,
-  /// Each level (string key) mapped to its probability (floats that sum to 1).
+  /// The probability of each level, keyed by level number as a string.
+  /// The values sum to 1.
   probabilities: Probabilities,
-  /// How certain the model is, derived from probabilities.
+  /// The model's certainty, calculated from the probabilities.
   confidence:    Confidence,
 }
 
 impl ScoreAnswer {
-  /// The probability-weighted answer across the levels; can land between levels.
+  /// The average level number, weighted by probability.
+  /// The score can fall between levels.
   #[must_use]
   pub const fn score(&self) -> f64 {
     self.score
   }
 
-  /// Each level number mapped back to its description.
+  /// Level descriptions, keyed by level number.
   #[must_use]
   pub const fn legend(&self) -> &ScoreLegend {
     &self.legend
   }
 
-  /// Each level (string key) mapped to its probability (floats that sum to 1).
+  /// The probability of each level, keyed by level number as a string.
+  /// The values sum to 1.
   #[must_use]
   pub const fn probabilities(&self) -> &Probabilities {
     &self.probabilities
   }
 
-  /// How certain the model is, derived from probabilities.
+  /// The model's certainty, calculated from the probabilities.
   #[must_use]
   pub const fn confidence(&self) -> Confidence {
     self.confidence
